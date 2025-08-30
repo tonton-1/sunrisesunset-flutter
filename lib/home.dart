@@ -13,17 +13,41 @@ class Homepage extends StatefulWidget {
   State<Homepage> createState() => _HomepageState();
 }
 
+List<SunTimes?> listData = List.filled(6, null);
+
 class _HomepageState extends State<Homepage> {
   late SunTimes sunriseSunsetData;
-  late SunTimes chiangmaiSunsetData;
+  late SunTimes ListDataContainer;
   @override
   void initState() {
     tz.initializeTimeZones();
     super.initState();
     sunriseSunsetData = SunTimes();
-    chiangmaiSunsetData = SunTimes();
+    ListDataContainer = SunTimes();
     loadData();
-    loadChiangmaiData();
+    loadAllListData();
+  }
+
+  List<Map<String, String>> items = [
+    {'city': 'Chiangmai', 'lat': '18.777806', 'lng': '98.995495'},
+    {'city': 'Bangkok', 'lat': '13.756331', 'lng': '100.501762'},
+    {'city': 'Phuket', 'lat': '7.880448', 'lng': '98.392300'},
+    {'city': 'Hat Yai', 'lat': '7.008911', 'lng': '100.474610'},
+    {'city': 'Khon Kaen', 'lat': '16.441891', 'lng': '102.835000'},
+    {'city': 'Udon Thani', 'lat': '17.364720', 'lng': '102.815000'},
+  ];
+  void loadAllListData() async {
+    for (int i = 0; i < items.length; i++) {
+      double lat = double.parse(items[i]['lat']!);
+      double lng = double.parse(items[i]['lng']!);
+      final data = await ApiService().fetchSunriseSunset(
+        mylocationlat: lat,
+        mylocationlng: lng,
+      );
+      setState(() {
+        listData[i] = data;
+      });
+    }
   }
 
   @override
@@ -46,6 +70,7 @@ class _HomepageState extends State<Homepage> {
     print('London: $nowLondon'); // 👉 เวลา London
     print('New York: $nowNY'); // 👉 เวลา New York
     print('Bangkok: $nowBKK'); // 👉 เวลา กรุงเทพฯ
+
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
 
@@ -151,52 +176,76 @@ class _HomepageState extends State<Homepage> {
             ),
 
             Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-
-                color: const Color.fromARGB(255, 255, 255, 255),
-              ),
-
-              height: 80,
+              height: 600,
               width: 400,
-              child: Row(
-                children: [
-                  SizedBox(width: 10),
-                  Text('Chiangmai', style: GoogleFonts.kanit(fontSize: 16)),
+              child: ListView.builder(
+                itemCount: 6,
+                itemBuilder: (context, index) {
+                  final city = items[index]['city'];
+                  final sunrise =
+                      listData[index]?.results?.sunrise ?? 'Loading...';
+                  final sunset =
+                      listData[index]?.results?.sunset ?? 'Loading...';
+                  return Container(
+                    margin: EdgeInsets.only(top: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
 
-                  SizedBox(width: 150),
-                  Row(
-                    spacing: 25,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.north),
-                          Text(
-                            '${chiangmaiSunsetData.results?.sunrise ?? 'Loading...'}',
-                            style: GoogleFonts.kanit(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
+                      color: const Color.fromARGB(255, 255, 255, 255),
+                    ),
+
+                    height: 80,
+                    width: 400,
+                    child: Row(
+                      children: [
+                        SizedBox(width: 10),
+                        Text(
+                          city ?? 'Loading...',
+                          style: GoogleFonts.kanit(fontSize: 16),
+                        ),
+
+                        Spacer(),
+                        Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 0,
                           ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.south),
-                          Text(
-                            '${chiangmaiSunsetData.results?.sunset ?? 'Loading...'}',
-                            style: GoogleFonts.kanit(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          child: Row(
+                            spacing: 25,
+                            children: [
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.north),
+                                  Text(
+                                    sunrise,
+                                    style: GoogleFonts.kanit(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.south),
+                                  Text(
+                                    sunset,
+                                    style: GoogleFonts.kanit(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -216,22 +265,6 @@ class _HomepageState extends State<Homepage> {
       });
 
       print(sunriseSunsetData.results?.sunrise);
-    } catch (e) {
-      print("Error: $e");
-    }
-  }
-
-  void loadChiangmaiData() async {
-    try {
-      final data = await ApiService().fetchSunriseSunset(
-        mylocationlat: 18.777806,
-        mylocationlng: 98.995495,
-      );
-      setState(() {
-        chiangmaiSunsetData = data;
-      });
-
-      print(chiangmaiSunsetData.results?.sunrise);
     } catch (e) {
       print("Error: $e");
     }
