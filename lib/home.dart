@@ -57,19 +57,6 @@ class _HomepageState extends State<Homepage> {
     );
     String formattedDate = DateFormat("d MMMM yyyy").format(dateTime);
     String dayName = DateFormat('EEEE').format(dateTime);
-    // กำหนด timezone ที่ต้องการ เช่น London
-    final london = tz.getLocation('Europe/London');
-    final ny = tz.getLocation('America/New_York');
-    final bangkok = tz.getLocation('Asia/Bangkok');
-
-    // เวลาปัจจุบันของแต่ละประเทศ
-    final nowLondon = tz.TZDateTime.now(london);
-    final nowNY = tz.TZDateTime.now(ny);
-    final nowBKK = tz.TZDateTime.now(bangkok);
-
-    print('London: $nowLondon'); // 👉 เวลา London
-    print('New York: $nowNY'); // 👉 เวลา New York
-    print('Bangkok: $nowBKK'); // 👉 เวลา กรุงเทพฯ
 
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
@@ -107,12 +94,26 @@ class _HomepageState extends State<Homepage> {
                             width: 80,
                             height: 80,
                           ),
-                          Text(
-                            '${sunriseSunsetData.results?.sunrise ?? 'Loading...'}',
-                            style: GoogleFonts.kanit(
-                              fontSize: 25,
-                              fontWeight: FontWeight.w500,
-                            ),
+
+                          Row(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(right: 8),
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color.fromARGB(178, 255, 193, 7),
+                                ),
+                              ),
+                              Text(
+                                '${sunriseSunsetData.results?.sunrise ?? 'Loading...'}',
+                                style: GoogleFonts.kanit(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -121,15 +122,29 @@ class _HomepageState extends State<Homepage> {
                         children: [
                           Image.asset(
                             'assets/images/sunset.png',
+
                             width: 80,
                             height: 80,
                           ),
-                          Text(
-                            '${sunriseSunsetData.results?.sunset ?? 'Loading...'}',
-                            style: GoogleFonts.kanit(
-                              fontSize: 25,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          Row(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(right: 8),
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color.fromARGB(176, 224, 80, 27),
+                                ),
+                              ),
+                              Text(
+                                '${sunriseSunsetData.results?.sunset ?? 'Loading...'}',
+                                style: GoogleFonts.kanit(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -194,7 +209,7 @@ class _HomepageState extends State<Homepage> {
                       color: const Color.fromARGB(255, 255, 255, 255),
                     ),
 
-                    height: 80,
+                    height: 90,
                     width: 400,
                     child: Row(
                       children: [
@@ -217,11 +232,32 @@ class _HomepageState extends State<Homepage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.north),
+
                                   Text(
                                     sunrise,
                                     style: GoogleFonts.kanit(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(height: 3),
+                                  Container(
+                                    padding: EdgeInsets.fromLTRB(5, 2, 5, 2),
+                                    decoration: BoxDecoration(
+                                      color: Color.fromARGB(178, 255, 193, 7),
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Text(
+                                      'sunrise',
+                                      style: GoogleFonts.kanit(
+                                        fontSize: 14,
+                                        color: const Color.fromARGB(
+                                          255,
+                                          255,
+                                          255,
+                                          255,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -235,6 +271,26 @@ class _HomepageState extends State<Homepage> {
                                     style: GoogleFonts.kanit(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(height: 3),
+                                  Container(
+                                    padding: EdgeInsets.fromLTRB(5, 2, 5, 2),
+                                    decoration: BoxDecoration(
+                                      color: Color.fromARGB(181, 255, 111, 67),
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Text(
+                                      'sunset',
+                                      style: GoogleFonts.kanit(
+                                        fontSize: 14,
+                                        color: const Color.fromARGB(
+                                          255,
+                                          255,
+                                          255,
+                                          255,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -254,11 +310,28 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
+  //   void loadData() async {
+  //     try {
+  //       final data = await ApiService().fetchSunriseSunset(
+  //         mylocationlat: 14.020308,
+  //         mylocationlng: 100.000322,
+  //       );
+  //       setState(() {
+  //         sunriseSunsetData = data;
+  //       });
+
+  //       print(sunriseSunsetData.results?.sunrise);
+  //     } catch (e) {
+  //       print("Error: $e");
+  //     }
+  //   }
+  // }
   void loadData() async {
     try {
-      final data = await ApiService().fetchSunriseSunset(
+      final data = await ApiService().fetchSunriseSunsetWithDate(
         mylocationlat: 14.020308,
         mylocationlng: 100.000322,
+        date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
       );
       setState(() {
         sunriseSunsetData = data;

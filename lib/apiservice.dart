@@ -23,4 +23,26 @@ class ApiService {
       );
     }
   }
+
+  Future<SunTimes> fetchSunriseSunsetWithDate({
+    // double mylocationlat = 14.020308,
+    // double mylocationlng = 100.000322,
+    required double mylocationlat,
+    required double mylocationlng,
+    required String date,
+  }) async {
+    final url = Uri.parse(
+      'https://api.sunrisesunset.io/json?lat=$mylocationlat&lng=$mylocationlng&time_format=24&date=$date',
+    );
+
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final map = json.decode(response.body) as Map<String, dynamic>;
+      return SunTimes.fromJson(map);
+    } else {
+      throw Exception(
+        'Failed to load sunrise/sunset data: ${response.statusCode}',
+      );
+    }
+  }
 }
