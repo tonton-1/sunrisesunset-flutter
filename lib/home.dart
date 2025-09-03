@@ -310,22 +310,6 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  //   void loadData() async {
-  //     try {
-  //       final data = await ApiService().fetchSunriseSunset(
-  //         mylocationlat: 14.020308,
-  //         mylocationlng: 100.000322,
-  //       );
-  //       setState(() {
-  //         sunriseSunsetData = data;
-  //       });
-
-  //       print(sunriseSunsetData.results?.sunrise);
-  //     } catch (e) {
-  //       print("Error: $e");
-  //     }
-  //   }
-  // }
   void loadData() async {
     try {
       final data = await ApiService().fetchSunriseSunsetWithDate(
